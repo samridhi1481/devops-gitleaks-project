@@ -1,0 +1,8 @@
+- name: Deploy Attendance App
+  hosts: localhost
+  tasks:
+    - name: Build Docker Image
+      command: docker build -t attendance-app .
+
+    - name: Run Container
+      command: docker run attendance-app
