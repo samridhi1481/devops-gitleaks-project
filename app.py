@@ -1,32 +1,28 @@
-from flask import Flask, request
+from flask import Flask, render_template, request, redirect
 
 app = Flask(__name__)
 
-attendance = []
-
 def mark_attendance(name):
-    attendance.append(name + " Present")
+    with open("attendance.txt", "a") as file:
+        file.write(name + " Present\n")
 
-def view_attendance():
-    return attendance
+def get_attendance():
+    try:
+        with open("attendance.txt", "r") as file:
+            return file.readlines()
+    except:
+        return []
 
-@app.route("/")
-def home():
-    return """
-    <h1>Attendance System</h1>
-    <p>Use /mark?name=YourName</p>
-    <p>Use /view to see records</p>
-    """
-
-@app.route("/mark")
-def mark():
-    name = request.args.get("name")
-    mark_attendance(name)
-    return f"{name} marked present"
-
-@app.route("/view")
-def view():
-    return "<br>".join(view_attendance()) if attendance else "No records"
+@app.route("/", methods=["GET", "POST"])
+def index():
+    if request.method == "POST":
+        name = request.form.get("name")
+        if name:
+            mark_attendance(name)
+        return redirect("/")
+    
+    records = get_attendance()
+    return render_template("index.html", records=records)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
