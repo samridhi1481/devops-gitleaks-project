@@ -1,3 +1,3 @@
 print("✅ CI/CD Pipeline Running Successfully!")
-api_key = "123456SECRETKEY"
+print("Clean code")
 print("Testing security")
