@@ -1,34 +1,32 @@
+from flask import Flask, request
+
+app = Flask(__name__)
+
+attendance = []
+
 def mark_attendance(name):
-    with open("attendance.txt", "a") as file:
-        file.write(name + " Present\n")
-    print(f"{name} marked present")
+    attendance.append(name + " Present")
 
 def view_attendance():
-    try:
-        with open("attendance.txt", "r") as file:
-            print("\nAttendance Records:\n")
-            print(file.read())
-    except FileNotFoundError:
-        print("No attendance records found.")
+    return attendance
 
-def menu():
-    while True:
-        print("\n--- Attendance Management System ---")
-        print("1. Mark Attendance")
-        print("2. View Attendance")
-        print("3. Exit")
+@app.route("/")
+def home():
+    return """
+    <h1>Attendance System</h1>
+    <p>Use /mark?name=YourName</p>
+    <p>Use /view to see records</p>
+    """
 
-        choice = input("Enter choice: ")
+@app.route("/mark")
+def mark():
+    name = request.args.get("name")
+    mark_attendance(name)
+    return f"{name} marked present"
 
-        if choice == '1':
-            name = input("Enter student name: ")
-            mark_attendance(name)
-        elif choice == '2':
-            view_attendance()
-        elif choice == '3':
-            print("Exiting...")
-            break
-        else:
-            print("Invalid choice")
+@app.route("/view")
+def view():
+    return "<br>".join(view_attendance()) if attendance else "No records"
 
-menu()
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
