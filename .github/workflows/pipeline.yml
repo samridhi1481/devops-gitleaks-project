@@ -1,0 +1,27 @@
+name: Secure CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  security-check:
+    runs-on: ubuntu-latest
+
+    steps:
+    
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Install Gitleaks
+      run: |
+        wget https://github.com/gitleaks/gitleaks/releases/latest/download/gitleaks-linux-amd64
+        chmod +x gitleaks-linux-amd64
+        sudo mv gitleaks-linux-amd64 /usr/local/bin/gitleaks
+
+    - name: Run Gitleaks Scan
+      run: gitleaks detect --source . --verbose --redact
+
+    - name: Run App
+      run: python3 app.py
